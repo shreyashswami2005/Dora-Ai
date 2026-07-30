@@ -1,8 +1,8 @@
 <?php
-session_start();
+require_once 'includes/auth.php';
 $page_title = 'Login - PharmaShop';
 
-if (isset($_SESSION['user_id'])) {
+if (is_logged_in()) {
     header('Location: dashboard.php');
     exit;
 }

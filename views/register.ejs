@@ -1,0 +1,40 @@
+<%- include('partials/header') %>
+
+<div class="row justify-content-center">
+    <div class="col-md-6 col-lg-5">
+        <div class="card shadow-lg border-0 animate-fade-in">
+            <div class="card-body p-5">
+                <h2 class="text-center mb-4"><i class="fas fa-user-plus text-primary me-2"></i>Create Account</h2>
+                
+                <% if (typeof success !== 'undefined' && success) { %>
+                    <div class="alert alert-success animate-fade-in"><%- success %></div>
+                <% } %>
+                
+                <% if (typeof error !== 'undefined' && error) { %>
+                    <div class="alert alert-danger animate-shake"><%= error %></div>
+                <% } %>
+                
+                <form method="POST" action="/register" novalidate>
+                    <div class="mb-3">
+                        <label class="form-label">Username</label>
+                        <input type="text" class="form-control" name="username" required autofocus>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Email</label>
+                        <input type="email" class="form-control" name="email" required>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label">Password</label>
+                        <input type="password" class="form-control" name="password" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100 mb-3 hover-lift">
+                        <i class="fas fa-user-plus me-2"></i>Register
+                    </button>
+                </form>
+                <p class="text-center">Already have an account? <a href="/login">Login here</a></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<%- include('partials/footer') %>

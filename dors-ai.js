@@ -493,7 +493,7 @@
 
     async fetchDatabaseKnowledge() {
       try {
-        const response = await fetch('api_knowledge.php');
+        const response = await fetch('/api/knowledge');
         if (response.ok) {
           const result = await response.json();
           if (result.status === "success" && Array.isArray(result.data)) {

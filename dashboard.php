@@ -56,6 +56,15 @@ $user = $stmt->fetch();
         </div>
     </div>
     <div class="col-xl-3 col-md-6">
+        <div class="card h-100 shadow-sm border-0 hover-lift animate-fade-in" style="cursor: pointer;" onclick="window.location.href='dors-admin.php'">
+            <div class="card-body text-center">
+                <i class="fas fa-brain fa-3x text-primary mb-3"></i>
+                <h3 class="text-primary mb-1">Dora AI</h3>
+                <p class="mb-0">Knowledge Admin</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6">
         <div class="card h-100 shadow-sm border-0 hover-lift animate-fade-in">
             <div class="card-body text-center">
                 <i class="fas fa-shopping-cart fa-3x text-primary mb-3"></i>

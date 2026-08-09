@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dors AI Assistant - Next-Gen 3D Voice System</title>
+    <!-- Fonts & Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="dors-ai.css">
+</head>
+<body data-theme="cyber">
+
+    <!-- 3D Three.js WebGL Canvas -->
+    <canvas id="webgl-canvas"></canvas>
+
+    <!-- Main UI Application Grid -->
+    <div class="app-container">
+
+        <!-- Top Header Bar -->
+        <header class="app-header">
+            <div class="brand-section">
+                <div class="logo-orb">D</div>
+                <div class="brand-title">
+                    <h1>DORS AI</h1>
+                    <div class="brand-tag">
+                        <span class="status-dot"></span> Advanced AI System • Latency &lt; 2.0s
+                    </div>
+                </div>
+            </div>
+
+            <div class="header-actions">
+                <div class="latency-badge" id="latency-meter">
+                    <span class="badge-pulse"></span>
+                    <span id="latency-text">⚡ Latency: 0.12s</span>
+                </div>
+                <button class="icon-btn" id="btn-voice-settings" title="Voice Tune & Human Voice Selector">
+                    <i class="fa-solid fa-sliders"></i> Human Voice
+                </button>
+                <button class="icon-btn" id="btn-theme-toggle" title="Switch 3D Theme">
+                    <i class="fa-solid fa-palette"></i> Theme
+                </button>
+                <button class="icon-btn" id="btn-data-store" title="Manage India Data Base">
+                    <i class="fa-solid fa-database"></i> India Data
+                </button>
+                <button class="icon-btn" id="btn-arch-info" title="System Architecture & Benchmark">
+                    <i class="fa-solid fa-microchip"></i> Architecture
+                </button>
+            </div>
+        </header>
+
+        <!-- Left Sidebar: India Quick Knowledge & Music Suite -->
+        <aside class="sidebar-left">
+            <div class="glass-panel">
+                <div class="panel-title">
+                    <span>🇮🇳 India Knowledge Hub</span>
+                    <span class="badge">Direct Index</span>
+                </div>
+                <div class="topic-list" id="quick-topic-list">
+                    <div class="topic-card" data-query="Open YouTube">
+                        <div class="topic-icon">▶️</div>
+                        <div class="topic-info">
+                            <h4>Open YouTube</h4>
+                            <p>Launch YouTube in new tab</p>
+                        </div>
+                    </div>
+                    <div class="topic-card" data-query="Open WhatsApp">
+                        <div class="topic-icon">💬</div>
+                        <div class="topic-info">
+                            <h4>Open WhatsApp Web</h4>
+                            <p>Launch WhatsApp Web in new tab</p>
+                        </div>
+                    </div>
+                    <div class="topic-card" data-query="Open ChatGPT">
+                        <div class="topic-icon">🤖</div>
+                        <div class="topic-info">
+                            <h4>Open ChatGPT</h4>
+                            <p>Launch ChatGPT AI in new tab</p>
+                        </div>
+                    </div>
+                    <div class="topic-card" data-query="Open VS Code">
+                        <div class="topic-icon">💻</div>
+                        <div class="topic-info">
+                            <h4>Open VS Code</h4>
+                            <p>Launch VS Code for the Web</p>
+                        </div>
+                    </div>
+                    <div class="topic-card" data-query="Open LinkedIn">
+                        <div class="topic-icon">💼</div>
+                        <div class="topic-info">
+                            <h4>Open LinkedIn</h4>
+                            <p>Launch LinkedIn in new tab</p>
+                        </div>
+                    </div>
+                    <div class="topic-card" data-query="Open Chrome">
+                        <div class="topic-icon">🌐</div>
+                        <div class="topic-info">
+                            <h4>Open New Tab</h4>
+                            <p>Launch a new blank tab</p>
+                        </div>
+                    </div>
+                    <div class="topic-card" data-query="Tell me about ISRO and Chandrayaan-3">
+                        <div class="topic-icon">🚀</div>
+                        <div class="topic-info">
+                            <h4>ISRO & Space</h4>
+                            <p>Chandrayaan-3, Gaganyaan, History</p>
+                        </div>
+                    </div>
+                    <div class="topic-card" data-query="Tell me about Taj Mahal and Indian heritage">
+                        <div class="topic-icon">🏛️</div>
+                        <div class="topic-info">
+                            <h4>Culture & Heritage</h4>
+                            <p>Taj Mahal, Hampi, Ajanta</p>
+                        </div>
+                    </div>
+                    <div class="topic-card" data-query="Tell me about Rohit Sharma">
+                        <div class="topic-icon">🏏</div>
+                        <div class="topic-info">
+                            <h4>Rohit Sharma & Cricket</h4>
+                            <p>Hitman, World Cup 2024, Records</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Alexa-Style Music Player Widget -->
+            <div class="glass-panel music-player-panel">
+                <div class="panel-title">
+                    <span>🎵 Dors Music Suite</span>
+                    <span class="badge" id="music-status-badge">Alexa Mode</span>
+                </div>
+                <div class="music-card">
+                    <div class="album-art" id="album-art-box">
+                        <i class="fa-solid fa-music"></i>
+                    </div>
+                    <div class="track-details">
+                        <div class="track-title" id="track-title">Kesariya - Brahmastra</div>
+                        <div class="track-artist" id="track-artist">Arijit Singh • Trending Indian Stream</div>
+                    </div>
+                </div>
+                <div class="player-controls">
+                    <button class="icon-btn" id="btn-prev-track"><i class="fa-solid fa-backward-step"></i></button>
+                    <button class="play-btn" id="btn-play-pause"><i class="fa-solid fa-play" id="play-icon"></i></button>
+                    <button class="icon-btn" id="btn-next-track"><i class="fa-solid fa-forward-step"></i></button>
+                </div>
+                <canvas class="equalizer-canvas" id="eq-canvas"></canvas>
+            </div>
+
+            <!-- Developer Info Card -->
+            <div class="glass-panel" style="margin-top: 20px; text-align: center; font-size: 0.85rem; line-height: 1.6; padding: 15px;">
+                <h4 style="color: var(--primary-neon); margin-bottom: 10px; font-family: var(--font-heading); letter-spacing: 1px;"><i class="fa-solid fa-code"></i> Developer Info</h4>
+                <div style="color: var(--text-bright); font-weight: 600; font-size: 1rem; margin-bottom: 8px;">Shreyash Swami</div>
+                <div style="color: var(--text-muted); margin-bottom: 4px;"><i class="fa-solid fa-envelope" style="margin-right: 5px;"></i> shreyashswami2005@gmail.com</div>
+                <div style="color: var(--text-muted); margin-bottom: 4px;"><i class="fa-solid fa-phone" style="margin-right: 5px;"></i> +91 9146351394</div>
+                <div style="color: var(--text-muted); margin-bottom: 15px;"><i class="fa-solid fa-location-dot" style="margin-right: 5px;"></i> Kolhapur, Maharashtra</div>
+                <a href="dors-admin.php" target="_blank" style="display: block; background: rgba(0, 240, 255, 0.1); color: var(--primary-neon); border: 1px solid var(--primary-neon); padding: 8px; border-radius: 6px; text-decoration: none; font-weight: bold; transition: 0.3s;" onmouseover="this.style.background='var(--primary-neon)'; this.style.color='#000';" onmouseout="this.style.background='rgba(0, 240, 255, 0.1)'; this.style.color='var(--primary-neon)';"><i class="fa-solid fa-user-shield me-2"></i> Admin Login</a>
+            </div>
+        </aside>
+
+        <!-- Center Stage: 3D HUD & Audio Waves -->
+        <main class="center-stage">
+            <div class="hud-ring">
+                <div class="dora-center-text" id="dora-center-logo">
+                    <span class="dora-letter dora-d">D</span><span class="dora-letter dora-o">O</span><span class="dora-letter dora-r">R</span><span class="dora-letter dora-a">A</span>
+                </div>
+                <div class="status-tag" id="ai-status-tag">SYSTEM READY</div>
+                <div class="voice-wave-container" id="voice-wave">
+                    <div class="wave-bar"></div>
+                    <div class="wave-bar"></div>
+                    <div class="wave-bar"></div>
+                    <div class="wave-bar"></div>
+                    <div class="wave-bar"></div>
+                </div>
+            </div>
+
+            <!-- Central Glassmorphic HUD Search Bar -->
+            <div class="center-search-box">
+                <div class="center-input-wrapper">
+                    <i class="fa-solid fa-magnifying-glass search-icon-lead"></i>
+                    <input type="text" class="center-chat-input" id="center-chat-input" placeholder="Search any topic, Rohit Sharma, SBI Bank, SGU College, Math..." autocomplete="off">
+                    <button class="center-mic-btn" id="btn-center-mic" title="Voice Search">
+                        <i class="fa-solid fa-microphone"></i>
+                    </button>
+                    <button class="center-send-btn" id="btn-center-send" title="Search Now">
+                        <i class="fa-solid fa-bolt"></i> <span>Search</span>
+                    </button>
+                </div>
+            </div>
+        </main>
+
+        <!-- Right Sidebar: Interactive Voice Chat -->
+        <aside class="sidebar-right">
+            <div class="glass-panel chat-panel">
+                <div class="panel-title">
+                    <span>💬 Voice & Text Feed</span>
+                    <button class="speak-again-btn" id="btn-clear-chat" title="Clear Feed">
+                        <i class="fa-solid fa-trash-can"></i> Clear
+                    </button>
+                </div>
+                <div class="messages-container" id="chat-messages">
+                    <div class="chat-bubble dors">
+                        Namaste! I am <strong>Dors AI</strong>, your ultra-fast voice assistant. Ask me any question about India, science, music, or commands like <em>"Play Kesariya song"</em> or <em>"Tell me about ISRO"</em>. My responses take under 2 seconds! ⚡
+                        <div class="chat-meta">
+                            <span>0.05s</span>
+                            <button class="speak-again-btn" onclick="window.dorsApp.speakText(this.parentNode.parentNode.innerText)"><i class="fa-solid fa-volume-high"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Bottom Input & Mic Trigger Bar -->
+        <footer class="bottom-bar">
+            <div class="input-wrapper">
+                <input type="text" class="chat-input" id="chat-input" placeholder="Ask Dors anything or press Mic for voice command... (e.g. 'Play song', 'Tell me about Taj Mahal')" autocomplete="off">
+                <button class="send-btn" id="btn-send" title="Send Message">
+                    <i class="fa-solid fa-paper-plane"></i>
+                </button>
+            </div>
+            <button class="mic-btn-main" id="btn-mic" title="Voice Input (Press to speak)">
+                <i class="fa-solid fa-microphone"></i>
+            </button>
+        </footer>
+
+    </div>
+
+    <!-- Modal 1: System Architecture & Benchmark -->
+    <div class="modal-overlay" id="modal-arch">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h2><i class="fa-solid fa-microchip"></i> System Architecture & Performance Benchmark</h2>
+                <button class="close-modal-btn" onclick="document.getElementById('modal-arch').classList.remove('active')">&times;</button>
+            </div>
+            <p style="color: var(--text-muted); font-size: 0.9rem;">
+                Dors AI is built using an asynchronous voice pipeline coupled with an indexed memory hash grid to achieve guaranteed <strong>sub-2 second query responses</strong>.
+            </p>
+
+            <div style="margin-top: 18px;">
+                <button class="submit-btn" id="btn-run-benchmark" style="width: auto; padding: 10px 24px;">
+                    <i class="fa-solid fa-bolt"></i> Run 10-Query Speed Test
+                </button>
+                <div id="benchmark-results" style="margin-top: 12px; font-family: var(--font-code); color: var(--primary-neon); font-size: 0.85rem;"></div>
+            </div>
+
+            <div class="arch-grid">
+                <div class="arch-card">
+                    <h3>1. Voice STT Module</h3>
+                    <p>Web Speech API continuous speech-to-text with real-time word boundary stream parsing.</p>
+                </div>
+                <div class="arch-card">
+                    <h3>2. Intent Engine</h3>
+                    <p>Pattern matcher & keyword vectorizer running in &lt;0.05ms local latency.</p>
+                </div>
+                <div class="arch-card">
+                    <h3>3. India Data Bank</h3>
+                    <p>Indexed structured repository of geography, history, heritage, space, and music data.</p>
+                </div>
+                <div class="arch-card">
+                    <h3>4. 3D WebGL Shader Loop</h3>
+                    <p>Three.js audio-reactive 60FPS particle sphere deformed dynamically by Web Audio API frequency nodes.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal 2: Custom India Data Bank Manager -->
+    <div class="modal-overlay" id="modal-data">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h2><i class="fa-solid fa-database"></i> India Knowledge Base Manager</h2>
+                <button class="close-modal-btn" onclick="document.getElementById('modal-data').classList.remove('active')">&times;</button>
+            </div>
+            <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 16px;">
+                Dora AI features an <strong>Auto-Learning Engine</strong>! Every new question asked via voice or text is automatically indexed and saved into <code>localStorage</code> so Dora gets smarter and remembers every topic forever.
+            </p>
+
+            <form class="data-form" id="form-add-data">
+                <input type="text" class="data-input" id="input-key" placeholder="Keywords / Trigger phrase (e.g. 'mangalyaan', 'prime minister', 'biryani')" required>
+                <textarea class="data-input" id="input-val" rows="3" placeholder="Instant Answer Response for Dors AI to speak..." required></textarea>
+                <button type="submit" class="submit-btn"><i class="fa-solid fa-plus"></i> Save to Local Data Store</button>
+            </form>
+
+            <div class="panel-title" style="margin-top: 20px;">
+                <span>Existing Stored Topics</span>
+                <span class="badge" id="data-count-badge">15 Loaded</span>
+            </div>
+            <div id="data-list-container" style="max-height: 200px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px;"></div>
+        </div>
+    </div>
+
+    <!-- Modal 3: Human Voice Tuning & Sound Control -->
+    <div class="modal-overlay" id="modal-voice">
+        <div class="modal-box" style="max-width: 600px;">
+            <div class="modal-header">
+                <h2><i class="fa-solid fa-sliders"></i> Human Voice Tuning & Audio Control</h2>
+                <button class="close-modal-btn" onclick="document.getElementById('modal-voice').classList.remove('active')">&times;</button>
+            </div>
+            <p style="color: var(--text-muted); font-size: 0.88rem; margin-bottom: 20px;">
+                Select your preferred natural human voice engine and adjust speech speed and pitch for smooth, lifelike voice responses.
+            </p>
+
+            <div style="display: flex; flex-direction: column; gap: 18px;">
+                <div>
+                    <label style="display: block; font-weight: 600; font-size: 0.9rem; margin-bottom: 8px; color: var(--primary-neon);">
+                        <i class="fa-solid fa-microphone-lines"></i> Select Natural Human Voice Engine:
+                    </label>
+                    <select id="voice-select" class="data-input" style="width: 100%; cursor: pointer;">
+                        <option value="">Loading system voices...</option>
+                    </select>
+                </div>
+
+                <div>
+                    <div style="display: flex; justify-content: space-between; font-weight: 600; font-size: 0.88rem; margin-bottom: 6px;">
+                        <span><i class="fa-solid fa-gauge-high"></i> Speech Speed (Rate):</span>
+                        <span id="rate-val" style="color: var(--primary-neon);">0.98x</span>
+                    </div>
+                    <input type="range" id="slider-rate" min="0.7" max="1.3" step="0.05" value="0.98" style="width: 100%; accent-color: var(--primary-neon); cursor: pointer;">
+                </div>
+
+                <div>
+                    <div style="display: flex; justify-content: space-between; font-weight: 600; font-size: 0.88rem; margin-bottom: 6px;">
+                        <span><i class="fa-solid fa-music"></i> Voice Pitch (Warmth):</span>
+                        <span id="pitch-val" style="color: var(--primary-neon);">1.00</span>
+                    </div>
+                    <input type="range" id="slider-pitch" min="0.7" max="1.3" step="0.05" value="1.0" style="width: 100%; accent-color: var(--primary-neon); cursor: pointer;">
+                </div>
+
+                <div style="display: flex; gap: 12px; margin-top: 10px;">
+                    <button class="submit-btn" id="btn-test-voice" style="flex: 1;">
+                        <i class="fa-solid fa-play"></i> Test Human Voice Output
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Three.js Library CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <!-- Main Application Logic Script -->
+    <script src="dors-ai.js"></script>
+
+</body>
+</html>

@@ -80,7 +80,7 @@
     // 👋 AI GREETINGS
     {
       keywords: ["hey dora", "heyy dora", "hi dora", "hello dora", "dora", "are you there"],
-      response: "👋 **Hi! I am Dora AI Assistant.** How can I help you today?"
+      response: "heyy flora"
     },
 
     // 🏏 CRICKET & FAMOUS PERSONALITIES
@@ -289,6 +289,10 @@
     {
       keywords: ["who are you", "your name", "dors", "what is dors", "what is dora"],
       response: "Namaste! I am Dora AI, an advanced 3D voice assistant designed for high-speed voice interaction. I am equipped with Three.js WebGL graphics, real-time Web Speech STT and TTS engines, an auto-learning database, Sports & Celebrity Profiles, Banking Branch Counters, Short-Word Quick Resolvers, Sanjay Ghodawat University (SGU) Profiles, Universal Full Form Solvers, Banking Address Databanks, Indian & World History Databanks, World Languages Knowledge, Advanced Maths & STEM problem solvers, and full-information question answering capabilities in under 2 seconds!"
+    },
+    {
+      keywords: ["who build you", "who built you", "build you", "who created you", "who made you"],
+      response: "Shreyash Swami built me! 🚀"
     },
     {
       keywords: ["weather", "mumbai weather", "temperature", "forecast"],
@@ -905,6 +909,26 @@
       this.renderDataStoreList();
     }
 
+    // IMAGE GENERATION ENGINE
+    resolveImageQuery(cleanQuery) {
+      const q = cleanQuery.toLowerCase().trim();
+      const match = q.match(/^(?:create|build|generate|make|show me) (?:an |a )?(?:image|pic|picture|photo) of (.*)/i) || 
+                    q.match(/^(?:image|pic|picture|photo) of (.*)/i);
+      
+      if (match && match[1]) {
+        const prompt = match[1].trim();
+        const encodedPrompt = encodeURIComponent(prompt);
+        // Using Pollinations AI for open, free image generation
+        const imageUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=512&height=512&nologo=true`;
+        
+        return {
+          html: `🎨 **Image for "${prompt}"**<br><br><img src="${imageUrl}" alt="${prompt}" style="max-width: 100%; border-radius: 8px; box-shadow: 0 4px 15px rgba(0, 240, 255, 0.2); margin-top: 10px;">`,
+          spoken: `Here is the picture for ${prompt}.`
+        };
+      }
+      return null;
+    }
+
     // TIME & DATE ENGINE
     resolveTimeQuery(cleanQuery) {
       const q = cleanQuery.toLowerCase().trim();
@@ -1018,6 +1042,21 @@
         return;
       }
 
+      // 0.85. Image Generation Check
+      const imgAns = this.resolveImageQuery(cleanQuery);
+      if (imgAns) {
+        const endTime = performance.now();
+        const latencySec = ((endTime - startTime) / 1000).toFixed(2);
+        this.addChatBubble(imgAns.html, 'dors', `${latencySec}s`, true, imgAns.spoken);
+        this.speakText(imgAns.spoken);
+        
+        const latencyEl = document.getElementById('latency-text');
+        if (latencyEl) {
+          latencyEl.innerHTML = `⚡ Latency: <strong>${latencySec}s</strong>`;
+        }
+        return;
+      }
+
       // 1. Full Form & Acronym Solver Check
       const fullFormAns = this.resolveFullForm(cleanQuery);
       if (fullFormAns) {
@@ -1049,27 +1088,28 @@
         return;
       }
 
-      // 4. Online Live QA Fallback (Data Center / Wikipedia API Integration)
+      // 4. Online Live QA Fallback (Smarter AI Integration)
       let fetchedAnswer = null;
-      const topicTerm = cleanQuery.replace(/^(what is|who is|tell me about|explain|how does|why is|calculate|where is|solve|history of|address of|headquarters of|full form of|fullform of|how many|number of)\s*/i, '').trim();
+      // Encode the full query directly for a more intelligent answer
+      const encodedQuery = encodeURIComponent(cleanQuery);
 
       try {
-        const wikiUrl = `https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(topicTerm)}`;
+        const aiUrl = `https://text.pollinations.ai/prompt/${encodedQuery}?system=You%20are%20Dora%20AI%2C%20an%20advanced%20and%20helpful%20AI%20voice%20assistant.%20Keep%20answers%20concise%2C%20friendly%2C%20and%20direct.`;
         
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 1200);
+        const timeoutId = setTimeout(() => controller.abort(), 2000);
 
-        const res = await fetch(wikiUrl, { signal: controller.signal });
+        const res = await fetch(aiUrl, { signal: controller.signal });
         clearTimeout(timeoutId);
 
         if (res.ok) {
-          const data = await res.json();
-          if (data.extract) {
-            fetchedAnswer = `🌟 **Information Profile for "${cleanQuery}"**:\n${data.extract}`;
+          const aiResponse = await res.text();
+          if (aiResponse && !aiResponse.includes("Error")) {
+            fetchedAnswer = aiResponse;
           }
         }
       } catch (err) {
-        // Ignore network timeout
+        // Ignore network timeout and fall back to local answer
       }
 
       // 5. Detailed Educational Fallback Synthesizer

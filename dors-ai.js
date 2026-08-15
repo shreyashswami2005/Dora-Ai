@@ -1079,22 +1079,7 @@
 
       let matchedEntry = null;
 
-      // 0.5. Programming Code Engine Check
-      const codeAns = this.resolveCodeQuery(cleanQuery);
-      if (codeAns) {
-        this.addChatBubble(codeAns.html, 'dors', '0.05s', true, codeAns.spoken);
-        this.speakText(codeAns.spoken);
-        return;
-      }
-
-      // 0.75. Time & Date Check
-      const timeAns = this.resolveTimeQuery(cleanQuery);
-      if (timeAns) {
-        this.finishResponse(timeAns, startTime);
-        return;
-      }
-
-      // 0.85. Image Generation Check
+      // 0.3. Image Generation Check
       const imgAns = this.resolveImageQuery(cleanQuery);
       if (imgAns) {
         const endTime = performance.now();
@@ -1109,12 +1094,27 @@
         return;
       }
 
-      // 0.90. Document Generation Check
+      // 0.4. Document Generation Check
       const docTopic = this.resolveDocumentQuery(cleanQuery);
       if (docTopic) {
         this.addChatBubble(`⏳ **Generating Document for "${docTopic}"...**<br><span style="font-size:0.85rem;color:var(--text-muted);">Please wait, this may take up to 15 seconds.</span>`, 'dors', '...', false);
         this.speakText(`I am generating a document for ${docTopic}. Please wait.`);
         this.generateDocument(docTopic);
+        return;
+      }
+
+      // 0.5. Programming Code Engine Check
+      const codeAns = this.resolveCodeQuery(cleanQuery);
+      if (codeAns) {
+        this.addChatBubble(codeAns.html, 'dors', '0.05s', true, codeAns.spoken);
+        this.speakText(codeAns.spoken);
+        return;
+      }
+
+      // 0.75. Time & Date Check
+      const timeAns = this.resolveTimeQuery(cleanQuery);
+      if (timeAns) {
+        this.finishResponse(timeAns, startTime);
         return;
       }
 

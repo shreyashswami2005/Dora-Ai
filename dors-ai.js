@@ -911,7 +911,7 @@
 
     // IMAGE GENERATION ENGINE
     resolveImageQuery(cleanQuery) {
-      const q = cleanQuery.toLowerCase().trim();
+      const q = cleanQuery.toLowerCase().replace(/^["',]+|["',]+$/g, '').trim();
       const match = q.match(/^(?:create|build|generate|make|show me) (?:an |a )?(?:image|pic|picture|photo) of (.*)/i) || 
                     q.match(/^(?:image|pic|picture|photo) of (.*)/i);
       
@@ -931,7 +931,7 @@
 
     // DOCUMENT GENERATION ENGINE
     resolveDocumentQuery(cleanQuery) {
-      const q = cleanQuery.toLowerCase().trim();
+      const q = cleanQuery.toLowerCase().replace(/^["',]+|["',]+$/g, '').trim();
       const match = q.match(/^(?:create|build|generate|make|write) (?:a |an )?(?:pdf|document|doc|file|report) (?:of|about|for|on|with) (.*)/i) || 
                     q.match(/^(?:pdf|document|doc|file|report) (?:of|about|for|on|with) (.*)/i);
       

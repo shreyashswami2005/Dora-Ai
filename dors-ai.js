@@ -929,6 +929,58 @@
       return null;
     }
 
+    // DOCUMENT GENERATION ENGINE
+    resolveDocumentQuery(cleanQuery) {
+      const q = cleanQuery.toLowerCase().trim();
+      const match = q.match(/^(?:create|build|generate|make|write) (?:a |an )?(?:pdf|document|doc|file|report) (?:of|about|for|on|with) (.*)/i) || 
+                    q.match(/^(?:pdf|document|doc|file|report) (?:of|about|for|on|with) (.*)/i);
+      
+      if (match && match[1]) {
+        return match[1].trim();
+      }
+      return null;
+    }
+
+    async generateDocument(topic) {
+        try {
+            const prompt = `Write a detailed, comprehensive document about ${topic}. Keep it highly educational, well formatted, and informative.`;
+            const encodedPrompt = encodeURIComponent(prompt);
+            const aiUrl = `https://text.pollinations.ai/prompt/${encodedPrompt}?system=You%20are%20a%20helpful%20expert%20document%20writer.%20Respond%20only%20with%20the%20document%20content.`;
+            
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 15000); // 15s for document gen
+
+            const res = await fetch(aiUrl, { signal: controller.signal });
+            clearTimeout(timeoutId);
+
+            if (res.ok) {
+                const text = await res.text();
+                if (text && !text.toLowerCase().includes("error") && !text.includes("<html>")) {
+                    // Create Blob and Download
+                    const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `${topic.replace(/\s+/g, '_')}_Document.txt`;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                    
+                    const msg = `✅ **Document Generated!**<br>I have successfully created and downloaded a text document about **${topic}** for you!`;
+                    this.addChatBubble(msg, 'dors', '10.50s', true, `I have successfully created and downloaded the document about ${topic} for you!`);
+                    this.speakText(`I have successfully created and downloaded the document about ${topic} for you!`);
+                    return;
+                }
+            }
+            throw new Error("Invalid Response");
+        } catch(err) {
+            const msg = `❌ **Failed to Generate Document**<br>I'm sorry, the document generation server is currently busy or took too long. Please try again later.`;
+            this.addChatBubble(msg, 'dors', 'Error', true, "I'm sorry, the document generation server is currently busy.");
+            this.speakText("I'm sorry, the document generation server is currently busy.");
+        }
+    }
+
     // TIME & DATE ENGINE
     resolveTimeQuery(cleanQuery) {
       const q = cleanQuery.toLowerCase().trim();
@@ -1054,6 +1106,15 @@
         if (latencyEl) {
           latencyEl.innerHTML = `⚡ Latency: <strong>${latencySec}s</strong>`;
         }
+        return;
+      }
+
+      // 0.90. Document Generation Check
+      const docTopic = this.resolveDocumentQuery(cleanQuery);
+      if (docTopic) {
+        this.addChatBubble(`⏳ **Generating Document for "${docTopic}"...**<br><span style="font-size:0.85rem;color:var(--text-muted);">Please wait, this may take up to 15 seconds.</span>`, 'dors', '...', false);
+        this.speakText(`I am generating a document for ${docTopic}. Please wait.`);
+        this.generateDocument(docTopic);
         return;
       }
 

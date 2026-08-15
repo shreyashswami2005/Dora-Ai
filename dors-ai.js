@@ -943,37 +943,42 @@
 
     async generateDocument(topic) {
         try {
-            const prompt = `Write a detailed, comprehensive document about ${topic}. Keep it highly educational, well formatted, and informative.`;
-            const encodedPrompt = encodeURIComponent(prompt);
-            const aiUrl = `https://text.pollinations.ai/prompt/${encodedPrompt}?system=You%20are%20a%20helpful%20expert%20document%20writer.%20Respond%20only%20with%20the%20document%20content.`;
+            const encodedTopic = encodeURIComponent(topic);
+            const aiUrl = `https://en.wikipedia.org/w/api.php?action=query&prop=extracts&explaintext=1&titles=${encodedTopic}&format=json&origin=*`;
             
             const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 15000); // 15s for document gen
+            const timeoutId = setTimeout(() => controller.abort(), 10000); // 10s timeout
 
             const res = await fetch(aiUrl, { signal: controller.signal });
             clearTimeout(timeoutId);
 
             if (res.ok) {
-                const text = await res.text();
-                if (text && !text.toLowerCase().includes("error") && !text.includes("<html>")) {
-                    // Create Blob and Download
-                    const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
-                    const url = URL.createObjectURL(blob);
-                    const a = document.createElement('a');
-                    a.href = url;
-                    a.download = `${topic.replace(/\s+/g, '_')}_Document.txt`;
-                    document.body.appendChild(a);
-                    a.click();
-                    document.body.removeChild(a);
-                    URL.revokeObjectURL(url);
-                    
-                    const msg = `✅ **Document Generated!**<br>I have successfully created and downloaded a text document about **${topic}** for you!`;
-                    this.addChatBubble(msg, 'dors', '10.50s', true, `I have successfully created and downloaded the document about ${topic} for you!`);
-                    this.speakText(`I have successfully created and downloaded the document about ${topic} for you!`);
-                    return;
+                const data = await res.json();
+                const pages = data.query?.pages;
+                if (pages) {
+                    const pageId = Object.keys(pages)[0];
+                    if (pageId !== "-1" && pages[pageId].extract) {
+                        const text = `=========================================\n       DOCUMENT: ${topic.toUpperCase()}\n=========================================\n\n${pages[pageId].extract}`;
+                        
+                        // Create Blob and Download
+                        const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+                        const url = URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = `${topic.replace(/\s+/g, '_')}_Document.txt`;
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
+                        URL.revokeObjectURL(url);
+                        
+                        const msg = `✅ **Document Generated!**<br>I have successfully created and downloaded a text document about **${topic}** for you!`;
+                        this.addChatBubble(msg, 'dors', '2.50s', true, `I have successfully created and downloaded the document about ${topic} for you!`);
+                        this.speakText(`I have successfully created and downloaded the document about ${topic} for you!`);
+                        return;
+                    }
                 }
             }
-            throw new Error("Invalid Response");
+            throw new Error("Invalid Response or Topic not found");
         } catch(err) {
             const msg = `❌ **Failed to Generate Document**<br>I'm sorry, the document generation server is currently busy or took too long. Please try again later.`;
             this.addChatBubble(msg, 'dors', 'Error', true, "I'm sorry, the document generation server is currently busy.");

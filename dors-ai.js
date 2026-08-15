@@ -1097,7 +1097,7 @@
         const aiUrl = `https://text.pollinations.ai/prompt/${encodedQuery}?system=You%20are%20Dora%20AI%2C%20an%20advanced%20and%20helpful%20AI%20voice%20assistant.%20Keep%20answers%20concise%2C%20friendly%2C%20and%20direct.`;
         
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 2000);
+        const timeoutId = setTimeout(() => controller.abort(), 8000); // Increased to 8s for LLM processing
 
         const res = await fetch(aiUrl, { signal: controller.signal });
         clearTimeout(timeoutId);
@@ -1110,6 +1110,7 @@
         }
       } catch (err) {
         // Ignore network timeout and fall back to local answer
+        console.warn("AI Fallback Error or Timeout:", err);
       }
 
       // 5. Detailed Educational Fallback Synthesizer

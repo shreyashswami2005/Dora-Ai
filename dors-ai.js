@@ -1290,6 +1290,53 @@
 
       document.getElementById('btn-center-mic')?.addEventListener('click', () => this.startListening());
 
+      // File and Folder Upload Listeners
+      const handleFileUpload = (e) => {
+        const files = e.target.files;
+        if (!files || files.length === 0) return;
+        
+        let fileNames = [];
+        let totalSize = 0;
+        let imagesHtml = '';
+
+        for(let i=0; i<files.length; i++) {
+            fileNames.push(files[i].name);
+            totalSize += files[i].size;
+            
+            if (files[i].type.startsWith('image/')) {
+                const url = URL.createObjectURL(files[i]);
+                imagesHtml += `<img src="${url}" style="max-width: 100px; max-height: 100px; border-radius: 8px; margin: 5px; border: 1px solid rgba(0,240,255,0.3);">`;
+            }
+        }
+        
+        const count = files.length;
+        const sizeMb = (totalSize / (1024 * 1024)).toFixed(2);
+        
+        let uploadMsg = `📁 **Uploaded ${count} ${count > 1 ? 'items' : 'item'}** (${sizeMb} MB)<br>`;
+        if (count <= 3) {
+            uploadMsg += fileNames.map(f => `• ${f}`).join('<br>');
+        } else {
+            uploadMsg += fileNames.slice(0, 3).map(f => `• ${f}`).join('<br>') + `<br>...and ${count - 3} more.`;
+        }
+        
+        if (imagesHtml) {
+            uploadMsg += `<br><div style="display: flex; flex-wrap: wrap; gap: 5px; margin-top: 10px;">${imagesHtml}</div>`;
+        }
+
+        this.addChatBubble(uploadMsg, 'user', 'Instant', true);
+        
+        const aiResponse = `I see you uploaded ${count} ${count > 1 ? 'items' : 'item'}. I have securely logged them in my memory buffer!`;
+        setTimeout(() => {
+            this.addChatBubble(aiResponse, 'dors', '0.10s');
+            this.speakText(aiResponse);
+        }, 600);
+        
+        e.target.value = ''; // reset
+      };
+
+      document.getElementById('file-upload')?.addEventListener('change', handleFileUpload);
+      document.getElementById('folder-upload')?.addEventListener('change', handleFileUpload);
+
       document.querySelectorAll('.topic-card').forEach(card => {
         card.addEventListener('click', () => {
           const query = card.getAttribute('data-query');

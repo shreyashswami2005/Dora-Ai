@@ -176,6 +176,9 @@
             <div class="center-search-box">
                 <div class="center-input-wrapper">
                     <i class="fa-solid fa-magnifying-glass search-icon-lead"></i>
+                    <button class="center-attach-btn" title="Attach File/Folder" onclick="document.getElementById('file-upload').click()">
+                        <i class="fa-solid fa-paperclip"></i>
+                    </button>
                     <input type="text" class="center-chat-input" id="center-chat-input" placeholder="Search any topic, Rohit Sharma, SBI Bank, SGU College, Math..." autocomplete="off">
                     <button class="center-mic-btn" id="btn-center-mic" title="Voice Search">
                         <i class="fa-solid fa-microphone"></i>
@@ -211,6 +214,16 @@
         <!-- Bottom Input & Mic Trigger Bar -->
         <footer class="bottom-bar">
             <div class="input-wrapper">
+                <button class="attach-btn" title="Attach File" onclick="document.getElementById('file-upload').click()">
+                    <i class="fa-solid fa-paperclip"></i>
+                </button>
+                <input type="file" id="file-upload" style="display: none;" multiple>
+                
+                <button class="attach-btn" title="Attach Folder" onclick="document.getElementById('folder-upload').click()">
+                    <i class="fa-solid fa-folder-open"></i>
+                </button>
+                <input type="file" id="folder-upload" style="display: none;" webkitdirectory directory multiple>
+                
                 <input type="text" class="chat-input" id="chat-input" placeholder="Ask Dors anything or press Mic for voice command... (e.g. 'Play song', 'Tell me about Taj Mahal')" autocomplete="off">
                 <button class="send-btn" id="btn-send" title="Send Message">
                     <i class="fa-solid fa-paper-plane"></i>

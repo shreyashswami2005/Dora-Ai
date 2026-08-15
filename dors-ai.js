@@ -1088,33 +1088,59 @@
         return;
       }
 
-      // 4. Online Live QA Fallback (Smarter AI Integration)
+      // 4. Online Live QA Fallback (Dual-Engine AI Integration)
       let fetchedAnswer = null;
-      // Encode the full query directly for a more intelligent answer
-      const encodedQuery = encodeURIComponent(cleanQuery);
-
+      
+      // Step A: Try Wikipedia first (super fast and reliable for facts/nouns)
+      const topicTerm = cleanQuery.replace(/^(what is|who is|tell me about|explain|how does|why is|calculate|where is|history of|full form of)\s*/i, '').trim();
+      
       try {
-        const aiUrl = `https://text.pollinations.ai/prompt/${encodedQuery}?system=You%20are%20Dora%20AI%2C%20an%20advanced%20and%20helpful%20AI%20voice%20assistant.%20Keep%20answers%20concise%2C%20friendly%2C%20and%20direct.`;
-        
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 8000); // Increased to 8s for LLM processing
+        const wikiUrl = `https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(topicTerm)}`;
+        const wikiController = new AbortController();
+        const wikiTimeout = setTimeout(() => wikiController.abort(), 1500); // 1.5s timeout for fast Wiki
 
-        const res = await fetch(aiUrl, { signal: controller.signal });
-        clearTimeout(timeoutId);
+        const wikiRes = await fetch(wikiUrl, { signal: wikiController.signal });
+        clearTimeout(wikiTimeout);
 
-        if (res.ok) {
-          const aiResponse = await res.text();
-          if (aiResponse && !aiResponse.includes("Error")) {
-            fetchedAnswer = aiResponse;
+        if (wikiRes.ok) {
+          const data = await wikiRes.json();
+          if (data.extract) {
+            fetchedAnswer = `**${data.title}**\n${data.extract}`;
           }
         }
       } catch (err) {
-        // Ignore network timeout and fall back to local answer
-        console.warn("AI Fallback Error or Timeout:", err);
+        console.warn("Wiki Fallback Missed:", err);
       }
 
-      // 5. Detailed Educational Fallback Synthesizer
-      const finalAnswer = fetchedAnswer || `🌟 **Information Profile for "${cleanQuery}"**:\nDora AI has fetched and saved "${cleanQuery}" directly into your local database for instant future offline retrieval and voice answers!`;
+      // Step B: If Wikipedia didn't know it, try conversational AI (Pollinations LLM)
+      if (!fetchedAnswer) {
+        try {
+            const encodedQuery = encodeURIComponent(cleanQuery);
+            const aiUrl = `https://text.pollinations.ai/prompt/${encodedQuery}?system=You%20are%20Dora%20AI%2C%20an%20advanced%20and%20helpful%20AI%20voice%20assistant.%20Keep%20answers%20concise%2C%20friendly%2C%20and%20direct.`;
+            
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 10000); // 10s for LLM processing
+
+            const res = await fetch(aiUrl, { signal: controller.signal });
+            clearTimeout(timeoutId);
+
+            if (res.ok) {
+              const aiResponse = await res.text();
+              if (aiResponse && !aiResponse.toLowerCase().includes("error") && !aiResponse.includes("<html>")) {
+                fetchedAnswer = aiResponse;
+              }
+            }
+        } catch (err) {
+            console.warn("AI Fallback Error or Timeout:", err);
+        }
+      }
+
+      // 5. Final Fallback Synthesizer
+      let finalAnswer = fetchedAnswer;
+      
+      if (!finalAnswer) {
+        finalAnswer = `I'm sorry, I couldn't find an exact answer for "${cleanQuery}" right now. But I have securely logged your question in my memory buffer, and I am learning more every second!`;
+      }
       
       // Auto-store both the topic term and original question as keywords so it is saved in local data store!
       const keywords = [

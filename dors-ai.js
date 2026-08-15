@@ -1137,11 +1137,16 @@
         return;
       }
 
-      // 3. Fast Indexed Pattern Matcher
+      // 3. Fast Indexed Pattern Matcher (Longest Keyword Wins)
+      let maxKwLen = 0;
       for (const entry of this.knowledgeData) {
-        if (entry.keywords.some(kw => textLower.includes(kw))) {
-          matchedEntry = entry;
-          break;
+        for (const kw of entry.keywords) {
+          if (!kw) continue;
+          const isMatch = new RegExp(`\\b${kw.replace(/[.*+?^${}()|[\\]\\\\]/g, '\\\\$&')}\\b`, 'i').test(textLower);
+          if (isMatch && kw.length > maxKwLen) {
+            maxKwLen = kw.length;
+            matchedEntry = entry;
+          }
         }
       }
 
